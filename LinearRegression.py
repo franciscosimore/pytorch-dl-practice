@@ -17,3 +17,13 @@ class LinearRegressionModel(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # Defines the forward computation
         return self.weight * x + self.bias
+
+# Linear Regression Model with just a Linear Layer
+class LinearRegressionModelWithLayer(nn.Module):
+    def __init__(self):
+        super().__init__()
+        # Use PyTorch pre-built Linear Layer / Linear Transform / Probing Layer / Fully Connected Layer / Dense Layer
+        self.linear_layer = nn.Linear(in_features=1, out_features=1)
+    
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.linear_layer(x)
