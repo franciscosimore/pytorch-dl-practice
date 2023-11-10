@@ -1,11 +1,11 @@
-from LinearRegression import LinearRegressionModel, LinearRegressionModelWithLayer
+from model import LinearRegressionModel, LinearRegressionModelWithLayer
 import torch
 from data import X_train, X_test, y_train, y_test
 from torch import nn
 from pathlib import Path
 
-MODEL_NAME = "01_layered.pth"
-MODEL_PATH = Path("models/LinearRegression")
+MODEL_NAME = "basic.pth"
+MODEL_PATH = Path("LinearRegression/models")
 MODEL_SAVE_PATH = MODEL_PATH / MODEL_NAME
 
 LR = 0.01
@@ -25,7 +25,8 @@ y_test = y_test.to(device)
 torch.manual_seed(42)
 
 # Create an instance of the model (subclass of nn.Module)
-model = LinearRegressionModelWithLayer()
+model = LinearRegressionModel()
+model = model.to(device)
 
 # Setup a MAE loss function
 loss_fn = nn.L1Loss()

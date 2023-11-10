@@ -1,13 +1,13 @@
 import torch
 from pathlib import Path
-from LinearRegression import LinearRegressionModel
+from model import LinearRegressionModel, LinearRegressionModelWithLayer
 from data import X_test, y_test
 
-MODEL_NAME = "01_basic.pth"
-MODEL_PATH = Path("models/LinearRegression")
+MODEL_NAME = "layered.pth"
+MODEL_PATH = Path("LinearRegression/models")
 MODEL_SAVE_PATH = MODEL_PATH / MODEL_NAME
 
-loaded_model = LinearRegressionModel() # Instantiate a new instance of the model class
+loaded_model = LinearRegressionModelWithLayer() # Instantiate a new instance of the model class
 loaded_model.load_state_dict(torch.load(f=MODEL_SAVE_PATH)) # Load PyTorch model state dict
 
 # Setup device-agnostic code
