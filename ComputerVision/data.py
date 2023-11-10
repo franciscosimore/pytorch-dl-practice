@@ -6,14 +6,14 @@ import torch
 BATCH_SIZE = 32
 RANDOM_SEED = 42
 
-train_data = datasets.FashionMNIST(root="data",
+train_data = datasets.FashionMNIST(root="ComputerVision/data",
                                    train=True,
                                    download=True,
                                    transform=ToTensor(), # How is data transformed?
                                    target_transform=None # How is labels/targets transformed?
 )
 
-test_data = datasets.FashionMNIST(root="data",
+test_data = datasets.FashionMNIST(root="ComputerVision/data",
                                   train=False,
                                   download=True,
                                   transform=ToTensor(), # How is data transformed?
