@@ -1,4 +1,4 @@
-from model import FashionMNISTModel, FashionMNISTModelNonLinear, FashionMNISTModelCNN
+from model import FashionMNISTModelCNN
 import torch
 from data import class_names, train_dataloader, test_dataloader
 from torch import nn
@@ -7,7 +7,7 @@ from timeit import default_timer as timer
 from tqdm.auto import tqdm
 from torch.utils.data import DataLoader
 
-MODEL_NAME = "nonlinear.pth"
+MODEL_NAME = "cnn.pth"
 MODEL_PATH = Path("ComputerVision/models")
 MODEL_SAVE_PATH = MODEL_PATH / MODEL_NAME
 
@@ -20,11 +20,12 @@ print(f"Using device: {device}")
 
 # Create a random seed, for reproducibility
 torch.manual_seed(42)
+torch.cuda.manual_seed(42)
 
 # Create an instance of the model (subclass of nn.Module)
-model = FashionMNISTModelNonLinear(input_shape=28*28,
-                          hidden_units=10,
-                          output_shape=len(class_names))
+model = FashionMNISTModelCNN(input_shape=1,
+                             hidden_units=10,
+                             output_shape=len(class_names))
 model = model.to(device)
 
 # Setup a Cross Entropy loss function

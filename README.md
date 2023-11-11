@@ -6,4 +6,6 @@
 - [ ] Clean code for printing
 - [ ] Incorporate auxiliary scripts to create visualizations for understanding and README.md
 - [ ] Implement a centralized form of helper functions that are commonly used
-- [ ] Implement good global, local, constant variables nomenclature
+- [ ] Implement good global, local, and constant variables nomenclature
+- [ ] Add better evaluation benchmarks and save them (using KPI and visualizations)
+- [ ] Implement good prediction/inference script (with visualizations)
