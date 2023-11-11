@@ -69,7 +69,7 @@ class ImageFolderCustom(Dataset):
         else:
             return img, class_idx # Return untrans formed data, label
 
-train_transform = transforms.Compose([
+train_transform_flip = transforms.Compose([
     transforms.Resize(size=(64,64)),
     transforms.RandomHorizontalFlip(p=0.5),
     transforms.ToTensor()
@@ -78,6 +78,11 @@ train_transform = transforms.Compose([
 train_transform_augmentation = transforms.Compose([
     transforms.Resize(size=(64,64)),
     transforms.TrivialAugmentWide(num_magnitude_bins=31),
+    transforms.ToTensor()
+])
+
+train_transform_basic = transforms.Compose([
+    transforms.Resize(size=(64,64)),
     transforms.ToTensor()
 ])
 
@@ -91,8 +96,13 @@ image_path = data_path / "pizza_steak_sushi"
 train_dir = image_path / "train"
 test_dir = image_path / "test"
 
-train_data_custom = ImageFolderCustom(targ_dir=train_dir,
-                                      transform=train_transform)
+train_data_custom_basic = ImageFolderCustom(targ_dir=train_dir,
+                                            transform=train_transform_basic)
+train_data_custom_flip = ImageFolderCustom(targ_dir=train_dir,
+                                           transform=train_transform_flip)
+train_data_custom_augmentation = ImageFolderCustom(targ_dir=train_dir,
+                                                   transform=train_transform_augmentation)
+
 test_data_custom = ImageFolderCustom(targ_dir=test_dir,
                                      transform=test_transform)
 
@@ -134,19 +144,29 @@ def display_random_images(dataset: Dataset,
 # display_random_images(train_data,classes=class_names.classes,n=20)
 
 BATCH_SIZE = 32
-NUM_WORKERS = os.cpu_count()
+# NUM_WORKERS = os.cpu_count()
+NUM_WORKERS = 0
 
-if __name__ == '__main__':
-    # Turn loaded images into DataLoader, it helps turn DataSets into iterables to then customize batch sizes
-    train_dataloader_custom = DataLoader(dataset=train_data_custom,
-                                         batch_size=32,
-                                         num_workers=NUM_WORKERS,
-                                         shuffle=True)
-    test_dataloader_custom = DataLoader(dataset=test_data_custom,
-                                        batch_size=32,
-                                        num_workers=NUM_WORKERS,
-                                        shuffle=False)
-    
-    img, label = next(iter(train_dataloader_custom))
-    print(f"Image shape: {img.shape} == [batch_size, color_channels, height, width]")
-    print(f"Label shape: {label.shape}")
+# if __name__ == '__main__':
+# Turn loaded images into DataLoader, it helps turn DataSets into iterables to then customize batch sizes
+train_dataloader_custom_basic = DataLoader(dataset=train_data_custom_basic,
+                                            batch_size=32,
+                                            num_workers=NUM_WORKERS,
+                                            shuffle=True)
+train_dataloader_custom_flip = DataLoader(dataset=train_data_custom_flip,
+                                            batch_size=32,
+                                            num_workers=NUM_WORKERS,
+                                            shuffle=True)
+train_dataloader_custom_augmentation = DataLoader(dataset=train_data_custom_augmentation,
+                                                    batch_size=32,
+                                                    num_workers=NUM_WORKERS,
+                                                    shuffle=True)
+
+test_dataloader_custom = DataLoader(dataset=test_data_custom,
+                                    batch_size=32,
+                                    num_workers=NUM_WORKERS,
+                                    shuffle=False)
+
+img, label = next(iter(train_dataloader_custom_basic))
+print(f"Image shape: {img.shape} == [batch_size, color_channels, height, width]")
+print(f"Label shape: {label.shape}")
