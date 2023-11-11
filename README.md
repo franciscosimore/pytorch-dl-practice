@@ -6,3 +6,4 @@
 - [ ] Clean code for printing
 - [ ] Incorporate auxiliary scripts to create visualizations for understanding and README.md
 - [ ] Implement a centralized form of helper functions that are commonly used
+- [ ] Implement good global, local, constant variables nomenclature

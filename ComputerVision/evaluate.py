@@ -1,7 +1,7 @@
 import torch
 from pathlib import Path
 from torch.utils.data import DataLoader
-from model import FashionMNISTModel
+from model import FashionMNISTModel, FashionMNISTModelNonLinear
 from data import class_names, test_dataloader
 from torch import nn
 from tqdm.auto import tqdm
@@ -36,7 +36,8 @@ def get_labels(y: torch.Tensor):
 def eval_model(model: torch.nn.Module,
                data_loader: DataLoader,
                loss_fn: torch.nn.Module,
-               get_accuracy):
+               get_accuracy,
+               device: torch.device = device):
     """
     Return a dictionary containing the results of model predicting on data_loader.
     """
@@ -70,5 +71,6 @@ def get_accuracy(y_true: torch.Tensor, y_pred: torch.Tensor):
 model_results = eval_model(model=loaded_model,
                            data_loader=test_dataloader,
                            loss_fn=loss_fn,
-                           get_accuracy=get_accuracy)
+                           get_accuracy=get_accuracy,
+                           device=device)
 print(model_results)

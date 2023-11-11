@@ -1,12 +1,13 @@
-from model import FashionMNISTModel
+from model import FashionMNISTModel, FashionMNISTModelNonLinear
 import torch
 from data import class_names, train_dataloader, test_dataloader
 from torch import nn
 from pathlib import Path
 from timeit import default_timer as timer
 from tqdm.auto import tqdm
+from torch.utils.data import DataLoader
 
-MODEL_NAME = "basic.pth"
+MODEL_NAME = "nonlinear.pth"
 MODEL_PATH = Path("ComputerVision/models")
 MODEL_SAVE_PATH = MODEL_PATH / MODEL_NAME
 
@@ -21,7 +22,7 @@ print(f"Using device: {device}")
 torch.manual_seed(42)
 
 # Create an instance of the model (subclass of nn.Module)
-model = FashionMNISTModel(input_shape=28*28,
+model = FashionMNISTModelNonLinear(input_shape=28*28,
                           hidden_units=10,
                           output_shape=len(class_names))
 model = model.to(device)
@@ -58,24 +59,26 @@ def print_train_time(start: float,
     print(f"Train time on {device}: {total_time:.3f} seconds")
     return total_time
 
-# Track
-epoch_count = []
-loss_values = []
-test_loss_values = []
-
-# NOTE: Optimizer will update model's parameters once per batch (not just once per epoch)!
-# 0. Loop thorugh epochs
-start_time = timer()
-for epoch in tqdm(range(EPOCHS)):
-    print(f"Epoch: {epoch}\n-----")
+def train_step(model: nn.Module,
+               data_loader: DataLoader,
+               loss_fn: nn.Module,
+               optimizer: torch.optim.Optimizer,
+               get_accuracy,
+               device: torch.device = device):
+    """
+    Perform a training step with model training on a DataLoader
+    NOTE: Optimizer will update model's parameters once per batch (not just once per epoch)!
+    """
     train_loss = 0 # Accumulate loss per batch
     train_acc = 0 # Accumulate accuracy per batch
+
+    # Set model to train mode: set gradient requirement to parameters with requires_grad=True
+    model.train()
+    
     # 0. Loop through training batches, perform training steps, calculate the train loss per batch
-    for batch, (X_train, y_train) in enumerate(train_dataloader): # (image, label)
+    for batch, (X_train, y_train) in enumerate(data_loader): # (image, label)
         X_train = X_train.to(device)
         y_train = y_train.to(device)
-        # Set model to train mode: set gradient requirement to parameters with requires_grad=True
-        model.train()
         y_logits = model(X_train) # 1. Forward pass
         loss = loss_fn(y_logits, y_train) # 2. Calculate loss (per batch)
         train_loss += loss
@@ -90,14 +93,22 @@ for epoch in tqdm(range(EPOCHS)):
     
     train_loss /= len(train_dataloader) # Average train loss per batch
     train_acc /= len(train_dataloader) # Average train accuracy per batch
-    
-    # TESTING
+
+    print(f"Train Loss: {train_loss:.5f} | Train Accuracy: {train_acc:.2f}")
+
+def test_step(model: nn.Module,
+              data_loader: DataLoader,
+              loss_fn: nn.Module,
+              get_accuracy,
+              device: torch.device = device):
+    """
+    Perform a testing step with model testing on a DataLoader
+    """
     test_loss, test_acc = 0, 0
     # Set model to evaluation mode (turn off not needed settings)
     model.eval()
-    
     with torch.inference_mode():
-        for X_test, y_test in test_dataloader: # Per batch...
+        for X_test, y_test in data_loader: # Per batch...
             X_test = X_test.to(device)
             y_test = y_test.to(device)
             test_logits = model(X_test) # Forward pass
@@ -105,14 +116,28 @@ for epoch in tqdm(range(EPOCHS)):
             test_loss += loss_fn(test_logits, y_test) # Calculate the loss
             test_acc += get_accuracy(y_true=y_test, y_pred=test_pred)
         
-        test_loss /= len(test_dataloader) # Average test loss per batch
-        test_acc /= len(test_dataloader) # Average test accuracy per batch
+        test_loss /= len(data_loader) # Average test loss per batch
+        test_acc /= len(data_loader) # Average test accuracy per batch
 
-    if epoch % 1 == 0:
-        epoch_count.append(epoch)
-        loss_values.append(loss)
-        test_loss_values.append(test_loss)
-        print(f"Epoch: {epoch} | Train Loss: {train_loss:.5f} | Train Accuracy: {train_acc:.2f} | Test loss: {test_loss:.5f} | Test Accuracy: {test_acc:.2f}")
+        print(f"Test loss: {test_loss:.5f} | Test Accuracy: {test_acc:.2f}")
+
+# 0. Loop thorugh epochs
+start_time = timer()
+for epoch in tqdm(range(EPOCHS)):
+    print(f"Epoch: {epoch}\n-----")
+
+    train_step(model=model,
+               data_loader=train_dataloader,
+               loss_fn=loss_fn,
+               optimizer=optimizer,
+               get_accuracy=get_accuracy,
+               device=device)
+    
+    test_step(model=model,
+              data_loader=test_dataloader,
+              loss_fn=loss_fn,
+              get_accuracy=get_accuracy,
+              device=device)
 
 end_time = timer()
 print_train_time(start=start_time,
