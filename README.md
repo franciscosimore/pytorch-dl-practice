@@ -13,3 +13,4 @@
 - [ ] ... also for custom data!
 - [ ] Add the option to troubleshoot PyTorch models by passing dummy data into it
 - [ ] IMPORTANT (BUG): fix when getting dataloaders (RuntimeError)
+- [ ] Implement README.md to other folders
