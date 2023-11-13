@@ -1,5 +1,6 @@
 # Data for training and testing
 **/data/
+/ExperimentTracking/models
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
