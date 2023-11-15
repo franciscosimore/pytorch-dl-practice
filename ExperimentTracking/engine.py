@@ -128,7 +128,8 @@ def train(model: torch.nn.Module,
           optimizer: torch.optim.Optimizer,
           loss_fn: torch.nn.Module,
           epochs: int,
-          device: torch.device) -> Dict[str, List]:
+          device: torch.device,
+          writer: SummaryWriter) -> Dict[str, List]:
     """Trains and tests a PyTorch model.
 
     Passes a target PyTorch models through train_step() and test_step()
@@ -160,8 +161,6 @@ def train(model: torch.nn.Module,
               test_loss: [1.2641, 1.5706],
               test_acc: [0.3400, 0.2973]} 
     """
-    writer = SummaryWriter()
-
     # Create empty results dictionary
     results = {"train_loss": [],
                "train_acc": [],
@@ -200,20 +199,38 @@ def train(model: torch.nn.Module,
         results["test_acc"].append(test_acc)
 
         # NOTE: EXPERIMENT TRACKING
-        writer.add_scalars(main_tag="Loss",
-                           tag_scalar_dict={"train_loss": train_loss,
-                                            "test_loss": test_loss},
-                            global_step=epoch)
-        writer.add_scalars(main_tag="Accuracy",
-                           tag_scalar_dict={"train_acc": train_acc,
-                                            "test_acc": test_acc},
-                            global_step=epoch)
-        writer.add_graph(model=model,
-                         input_to_model=torch.randn(32,3,224,224).to(device))
-        writer.close()
+        if writer:
+          writer.add_scalars(main_tag="Loss",
+                            tag_scalar_dict={"train_loss": train_loss,
+                                              "test_loss": test_loss},
+                              global_step=epoch)
+          writer.add_scalars(main_tag="Accuracy",
+                            tag_scalar_dict={"train_acc": train_acc,
+                                              "test_acc": test_acc},
+                              global_step=epoch)
+          writer.add_graph(model=model,
+                          input_to_model=torch.randn(32,3,224,224).to(device))
+          writer.close()
+        else:
+            pass
+    
     # Save PyTorch model state dict
     torch.save(obj=model.state_dict(), f=MODEL_SAVE_PATH)
     print(f"Model saved at {MODEL_SAVE_PATH}.")
 
     # Return the filled results at the end of the epochs
     return results
+
+def create_writer(model_name: str,
+                  experiment_name: str,
+                  extra: str):
+    """Creates a torch.utils.tensorboard.writer.SummaryWriter() instance tracking to a specific directory.
+    """
+    from datetime import datetime
+    import os
+    if extra:
+        log_dir = os.path.join("runs", model_name, experiment_name, extra)
+    else:
+        log_dir = os.path.join("runs", model_name, experiment_name)
+    print(f"[INFO] Creating SummaryWriter and saving it to {log_dir}")
+    return SummaryWriter(log_dir=log_dir)
