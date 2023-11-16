@@ -15,3 +15,5 @@
 - [ ] IMPORTANT (BUG): fix when getting dataloaders (RuntimeError)
 - [ ] Implement README.md to other folders
 - [ ] Helper function for data downloading (get_data)
+- [ ] ViT - Visualize patching of an image
+- [ ] ViT - Visualize all the steps done to transform the image into a sequence of vectors to pass through the transformer econder
