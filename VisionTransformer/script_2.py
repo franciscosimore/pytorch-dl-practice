@@ -10,6 +10,7 @@ from common import data_setup, engine
 from common.utils import set_seeds, save_model, get_data, plot_loss_curves
 from PIL import Image
 from patchembedding import PatchEmbedding
+from transformerencoder import MultiHeadSelfAttentionBlock, MLPBlock, TransformerEncoderBlock
 
 train_dir = "VisionTransformer/data/pizza_steak_sushi/train"
 test_dir = "VisionTransformer/data/pizza_steak_sushi/test"
@@ -67,3 +68,16 @@ position_embedding = nn.Parameter(torch.ones(1, number_of_patches+1, embedding_d
                                   requires_grad=True)
 patch_and_position_embedding_class_token = patch_embedding_class_token + position_embedding
 print(f"Patch and position embedding with class token shape: {patch_and_position_embedding_class_token.shape}")
+
+multi_head_self_attention_block = MultiHeadSelfAttentionBlock(embedding_dim=768,
+                                                              num_heads=12,
+                                                              attn_dropout=0)
+patched_image_through_msa_block = multi_head_self_attention_block(patch_and_position_embedding_class_token)
+print(f"Patch and position embedding with class token passed through MSA block shape: {patched_image_through_msa_block.shape}")
+
+mlp_block = MLPBlock(embedding_dim=768,
+                     mlp_size=3072,
+                     dropout=0.1)
+
+patched_image_through_msa_block_through_mlp_block = MLPBlock(patched_image_through_msa_block)
+print(f"Patch and position embedding with class token passed through MSA block and MLP block shape: {patched_image_through_msa_block_through_mlp_block.shape}")

@@ -1,5 +1,5 @@
 """
-1. Create a Classed called PatchEmbedding that inherits from nn.Module
+1. Create a Class called PatchEmbedding that inherits from nn.Module
 2. Initialize with appropiate hyperparameters, such as channels, embedding dimension, patch size.
 3. Create a layer to turn an image into embedding patches (using nn.Conv2d)
 4. Create a layer to flatten the feature maps of the output of the layer in (3)

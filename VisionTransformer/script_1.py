@@ -63,7 +63,7 @@ patchify = PatchEmbedding(in_channels=3,
                           patch_size=PATCH_SIZE,
                           embedding_dim=768)
 
-print(f"Input image size: {image.unsqueeze(0).shape}")
+print(f"Input tensor (image) size: {image.unsqueeze(0).shape}")
 
 image = patchify(image.unsqueeze(0))
 
